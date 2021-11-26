@@ -122,6 +122,7 @@ if __name__ == '__main__':
    # multiprocessing.Pool seems to be broken and sometimes doesn't catch up with adding new tasks
    # in callbacks, so we use futures.
    import concurrent.futures as fut
+   import multiprocessing
 
    parser = argparse.ArgumentParser("Finds the optimal distillation algorithm for the best possible"
                                     " multiplexed state.")
@@ -151,6 +152,9 @@ if __name__ == '__main__':
 
    print("Parameters: d = {:d}, s = {:d}, r = {:d}".format(args.d, args.s, args.r))
 
+   # bug on Windows: spawn tries to find the main executable in cwd instead of taking the actual
+   # path, so create the context before changing paths.
+   ctx = multiprocessing.get_context()
    try:
       directory = "{:d} {:d} {:d}".format(args.d, args.s, args.r)
       if args.erasure:
@@ -202,11 +206,11 @@ if __name__ == '__main__':
       # Windows: no fork, all processes have to initialize by themselves
       # Mac: broken fork, so Python spawns by default
       pool = fut.ProcessPoolExecutor(max_workers=args.workers, initializer=initialize,
-                                     initargs=initargs)
+                                     initargs=initargs, mp_context=ctx)
    else:
       # *nix:
       initialize(*initargs)
-      pool = fut.ProcessPoolExecutor(max_workers=args.workers)
+      pool = fut.ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx)
    active = 0
    for p in range(args.pmin, args.pmax +1):
       active += 1
