@@ -18,7 +18,7 @@ The `Optimizer...py` files define a class `Optimizer` that is responsible for ca
 optimization.
 The filename indicates the problem this corresponds to; this is detailed in the file header.
 
-We additionally provide two command line applications:
+We additionally provide three command line applications:
 
 - `Main.py` runs the optimizations for given parameters `d`, `s`, and `r`.
   Various configuration options are available, see the help.
@@ -42,6 +42,9 @@ We additionally provide two command line applications:
 
   The output is stored in a subfolder named `<ptrans> <d> <s>`; the files are named
   `<ptot> <f> <type>.dat`, where `<ptot>` now is the total success probability.
+- `MainStepwise.py` runs the optimization using the iterative basis selection approach introduced
+  in (Thesis link yet to come). Arguments are as before `d`, `s`, and `r`, as well as `pdist`.
+  The search starts with two kets; this choice can be overwritten specifying `--min=<larger number>`.
 
 Both applications are parallelized and by default use either the environment variable `SLURM_NTASK`
 (if the SLURM manager is used) or the number of physical cores available.
@@ -67,3 +70,7 @@ Note that the main application will automatically determine the number of thread
 appropriate SLURM environment variable.
 If a different scheduler is used, this value must be passed in the optional parameter
 `-workers=<multithreading level>`.
+
+## Using polynomial optimization for bounds
+The Julia file `qeccPolynomial.jl` contains code to construct the polynomial optimization problems associated with this
+problem. Usage instructions are at the bottom of the file.
